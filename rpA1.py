@@ -48,8 +48,14 @@ pm25 = PM25_UART(uart, reset_pin)
 print("Found PM2.5 sensor, reading data...")
 
 timerun = 0 
-timemax = int(input("How long would you like to run? "))
 timep = 0.75
+timemax = int(input("How long would you like to run? "))
+target_key = 'pm25 env'
+pm25dict = pm25.read()
+metastoredata = {key:value for key, value in pm25dict.items() if key == target_key}
+meta = [time.time(),metastoredata]
+
+
 
 while timerun<timemax:
     time.sleep(timep)
