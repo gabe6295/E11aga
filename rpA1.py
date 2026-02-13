@@ -94,3 +94,20 @@ while timerun<timemax:
     print(timeread)
     
     timerun += timep
+
+    import csv
+
+    file = open('rpA1.csv', 'w', newline= None)
+    csvwriter = csv.writer(file, delimeter=',')
+    
+    csvwriter.writerow(meta) 
+    
+    for i in range(10):
+        now = time.time()
+        value = np.random.random()
+        csvwriter.writerow([now,value]) #make into a list
+    
+    file.close() #close file
+
+
+    
