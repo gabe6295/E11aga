@@ -37,8 +37,8 @@ uart = serial.Serial("/dev/ttyS0", baudrate=9600, timeout=0.25)
 # uart = serial.Serial("/dev/ttyUSB0", baudrate=9600, timeout=0.25)
 
 # Connect to a PM2.5 sensor over UART
-# from adafruit_pm25.uart import PM25_UART
-# pm25 = PM25_UART(uart, reset_pin)
+from adafruit_pm25.uart import PM25_UART
+pm25 = PM25_UART(uart, reset_pin)
 
 # Create library object, use 'slow' 100KHz frequency!
 # i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
@@ -47,9 +47,14 @@ uart = serial.Serial("/dev/ttyS0", baudrate=9600, timeout=0.25)
 
 print("Found PM2.5 sensor, reading data...")
 
-while True:
-    time.sleep(1)
+timerun = 0 
+timemax = int(input("How long would you like to run? "))
+timep = 0.75
 
+while timerun<timemax:
+    time.sleep(timep)
+    
+    
     try:
         aqdata = pm25.read()
         # print(aqdata)
@@ -78,3 +83,8 @@ while True:
     print("Particles > 5.0um / 0.1L air:", aqdata["particles 50um"])
     print("Particles > 10 um / 0.1L air:", aqdata["particles 100um"])
     print("---------------------------------------")
+    timestamp = time.time()
+    timeread = time.strftime("%A, %B %d, %Y %I:%M:%S %p", time.localtime(timestamp))
+    print(timeread)
+    
+    timerun += timep
