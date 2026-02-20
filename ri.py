@@ -2,7 +2,7 @@ import adafruit_bme680
 import time
 import board
 import numpy as np
-
+# Comment
 n = 0
 # Create sensor object, communicating over the board's default I2C bus
 i2c = board.I2C()   # uses board.SCL and board.SDA
