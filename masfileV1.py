@@ -12,6 +12,11 @@ from adafruit_pm25.i2c import PM25_I2C
 from adafruit_pm25.uart import PM25_UART
 
 
+timemax = int(input("How long would you like to run? "))
+timerun = 0 
+timep = 2
+
+
 
 
 # ~~~~~~~~~~~~~~~~ begin ri.py bme data ~~~~~~~~~~~~~~~~ # 
@@ -24,30 +29,11 @@ bme680 = adafruit_bme680.Adafruit_BME680_I2C(i2c)
 # change this to match the location's pressure (hPa) at sea level
 bme680.sea_level_pressure = 1013.25
 
-l = []
 
-while n<5:
-    print("\nTemperature: %0.1f C" % bme680.temperature)
-    print("Gas: %d ohm" % bme680.gas)
-    print("Humidity: %0.1f %%" % bme680.relative_humidity)
-    print("Pressure: %0.3f hPa" % bme680.pressure)
-    print("Altitude = %0.2f meters" % bme680.altitude)
-    t = time.time()
-    r = time.localtime(t)
-    s = time.strftime("%A, %B %d, %Y %I:%M:%S %p", r)
-    print(s)
-
-    n+=1
-    time.sleep(1)
-    l.append([bme680.temperature])
-    l.append([bme680.gas])
-    l.append([bme680.relative_humidity])
-    l.append([bme680.pressure])
-    l.append([bme680.altitude])
-    l.append([t])
     
 
-np.savetxt('databme.csv',l,delimiter=",",fmt='%s')
+
+
 # ~~~~~~~~~~~~ end ~~~~~~~~~~~~~~~~~ # 
 
 
@@ -84,27 +70,14 @@ pm25 = PM25_UART(uart, reset_pin)
 # pm25 = PM25_I2C(i2c, reset_pin)
 
 print("Found PM2.5 sensor, reading data...")
-
-timerun = 0 
-timep = 2
-timemax = int(input("How long would you like to run? "))
 target_key = 'pm25 env'
 pm25dict = pm25.read()
 metastoredata = {key:value for key, value in pm25dict.items() if key == target_key}
 meta = [time.time(),metastoredata]
 
-
+l = []
 
 while timerun<timemax:
-    time.sleep(timep)
-    
-    
-    try:
-        aqdata = pm25.read()
-        # print(aqdata)
-    except RuntimeError:
-        print("Unable to read from sensor, retrying...")
-        continue
 
     print()
     print("Concentration Units (standard)")
@@ -131,7 +104,33 @@ while timerun<timemax:
     timeread = time.strftime("%A, %B %d, %Y %I:%M:%S %p", time.localtime(timestamp))
     print(timeread)
     
+    time.sleep(timep)
     timerun += timep
+    
+    print("\nTemperature: %0.1f C" % bme680.temperature)
+    print("Gas: %d ohm" % bme680.gas)
+    print("Humidity: %0.1f %%" % bme680.relative_humidity)
+    print("Pressure: %0.3f hPa" % bme680.pressure)
+    print("Altitude = %0.2f meters" % bme680.altitude)
+    t = time.time()
+    r = time.localtime(t)
+    s = time.strftime("%A, %B %d, %Y %I:%M:%S %p", r)
+    print(s)
+
+    l.append([bme680.temperature])
+    l.append([bme680.gas])
+    l.append([bme680.relative_humidity])
+    l.append([bme680.pressure])
+    l.append([bme680.altitude])
+    l.append([t])
+    
+    try:
+        aqdata = pm25.read()
+        # print(aqdata)
+    except RuntimeError:
+        print("Unable to read from sensor, retrying...")
+        continue
+
 
 
 
