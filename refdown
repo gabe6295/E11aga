@@ -1,0 +1,67 @@
+import board
+import time
+import csv
+import serial
+import adafruit_bme680
+from adafruit_pm25.uart import PM25_UART
+
+# --- Setup ---
+timemax = int(input("How long would you like to run (seconds)? "))
+timerun = 0 
+timep = 2  # Interval between readings
+
+# Setup BME680 (I2C)
+i2c = board.I2C()
+bme680 = adafruit_bme680.Adafruit_BME680_I2C(i2c)
+bme680.sea_level_pressure = 1013.25
+
+# Setup PM2.5 (UART)
+uart = serial.Serial("/dev/ttyS0", baudrate=9600, timeout=0.25)
+pm25 = PM25_UART(uart, None)
+
+print("Sensors initialized. Starting data collection...")
+
+# Prepare CSV File
+# We open it here so we can write headers
+with open('sensor_data.csv', 'w', newline='') as file:
+    csvwriter = csv.writer(file)
+    # Write Header Row
+    csvwriter.writerow(["Timestamp", "Temp(C)", "Humidity(%)", "Pressure(hPa)", "Gas(ohm)", "PM2.5_env"])
+
+    while timerun < timemax:
+        try:
+            # 1. Read PM2.5 Data
+            aqdata = pm25.read()
+            
+            # 2. Read BME680 Data
+            temp = bme680.temperature
+            gas = bme680.gas
+            hum = bme680.relative_humidity
+            pres = bme680.pressure
+            pm25_val = aqdata["pm25 env"]
+
+            # 3. Get Timestamp
+            curr_time = time.time()
+            readable_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(curr_time))
+
+            # 4. Print to Console (Simplified for readability)
+            print(f"\n--- {readable_time} ---")
+            print(f"Temp: {temp:.1f} C | Hum: {hum:.1f}% | PM2.5: {pm25_val}")
+            
+            # 5. Write to CSV immediately
+            csvwriter.writerow([curr_time, temp, hum, pres, gas, pm25_val])
+            file.flush() # Ensures data is written to disk even if program crashes
+
+        except RuntimeError:
+            print("Sensor read failure, retrying...")
+            time.sleep(1)
+            continue
+        except Exception as e:
+            print(f"Error occurred: {e}")
+            break
+
+        # Wait for the next interval
+        time.sleep(timep)
+        timerun += timep
+
+print("Data collection complete.")
