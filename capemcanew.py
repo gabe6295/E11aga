@@ -49,7 +49,6 @@ parser.add_argument("-i", "--interval", type=int, default=5, help="Logging inter
 parser.add_argument("-o", "--output", type=str, default="mca_log.csv", help="Output filename")
 args, _ = parser.parse_known_args()
 
-
 if __name__ == '__main__':
     import sys
     import time
