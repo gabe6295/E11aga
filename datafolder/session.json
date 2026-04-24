@@ -1,15 +1,12 @@
 {
-  "start_time": "2026-04-17_16-59-27",
-  "start_epoch": 1776470367.6783488,
+  "start_time": "2026-04-24_15-15-30",
+  "start_epoch": 1777068930.74386,
   "sensors_activated": [
     "Radiation",
     "Air Quality",
-    "CO2",
     "P/T/H"
   ],
   "integration_times": [
     2
-  ],
-  "end_time": "2026-04-17_16-59-48",
-  "end_epoch": 1776470388.585868
+  ]
 }
